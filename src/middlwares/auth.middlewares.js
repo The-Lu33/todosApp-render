@@ -5,20 +5,27 @@ export const authMiddleware = (req, res, next) => {
   let { authorization: token } = req.headers;
   token = token.replace("Bearer ", "");
   console.log(token);
-  verify(
-    token,
-    process.env.JWT_SECRET,
-    { algorithm: "HS512" },
-    (err, decoded) => {
-      if (err) {
-        res.status(400).json({
-          error: "invalid token",
-          message: "token no valido ",
-        });
-      } else {
-        console.log(decoded);
-        next();
+  if (token) {
+    verify(
+      token,
+      process.env.JWT_SECRET,
+      { algorithm: "HS512" },
+      (err, decoded) => {
+        if (err) {
+          res.status(400).json({
+            error: "invalid token",
+            message: "token no valido ",
+          });
+        } else {
+          console.log(decoded);
+          next();
+        }
       }
-    }
-  );
+    );
+  } else {
+    res.json({
+      message: "no hay token.",
+      error: "no se recibido un token de auteticacion.",
+    });
+  }
 };
